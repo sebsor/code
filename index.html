@@ -312,7 +312,57 @@
       margin-top: 1rem;
       opacity: 0.5;
     }
-  </style>
+  
+    /* ── Rune picker ── */
+    .rune-display-box {
+      min-height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.8rem 1rem;
+      line-height: 1.9;
+      word-break: break-all;
+      cursor: default;
+    }
+
+    .rune-display-box:empty::before {
+      content: 'Tap runes below to enter cipher text…';
+      color: var(--muted);
+      font-size: 1rem;
+      font-style: italic;
+    }
+
+    .rune-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      padding: 0.8rem 1.5rem;
+    }
+
+    .rune-btn {
+      width: 2.6rem;
+      height: 2.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--rune);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1;
+    }
+
+    .rune-btn:hover  { background: rgba(120,78,16,0.08); border-color: var(--gold-dim); }
+    .rune-btn:active { background: rgba(120,78,16,0.18); }
+
+    .picker-util {
+      flex: 1;
+    }
+
+</style>
 </head>
 <body>
 
@@ -368,17 +418,43 @@
     </select>
   </div>
   <div class="info-panel" id="dec-info"></div>
-  <div class="io-area">
-    <label class="io-label">Runic cipher text</label>
-    <textarea id="dec-input" class="rune-out" placeholder="Paste runes here…" oninput="liveDecrypt()"></textarea>
+
+  <!-- Mode toggle -->
+  <div class="btn-row" style="padding-top:1rem;">
+    <button class="action" id="btn-paste-mode" onclick="setDecryptMode('paste')">Paste Text</button>
+    <button class="action secondary" id="btn-enter-mode" onclick="setDecryptMode('enter')">Enter Text</button>
   </div>
+
+  <!-- Paste mode -->
+  <div id="dec-paste-mode">
+    <div class="io-area">
+      <label class="io-label">Runic cipher text</label>
+      <textarea id="dec-input" class="rune-out" placeholder="Paste runes here…" oninput="liveDecrypt()"></textarea>
+    </div>
+  </div>
+
+  <!-- Enter mode (rune picker) -->
+  <div id="dec-enter-mode" style="display:none">
+    <div class="io-area">
+      <label class="io-label">Runic cipher text</label>
+      <div id="rune-display" class="rune-out rune-display-box"></div>
+    </div>
+    <div class="rune-picker" id="rune-picker"></div>
+    <div class="btn-row" style="padding-top:0.5rem;">
+      <button class="action secondary picker-util" onclick="pickerAppend(' ')">Space</button>
+      <button class="action secondary picker-util" onclick="pickerAppend('·')">· Dot</button>
+      <button class="action secondary picker-util" onclick="pickerBackspace()">⌫ Delete</button>
+      <button class="action secondary picker-util" onclick="pickerClear()">Clear</button>
+    </div>
+  </div>
+
   <div class="io-area" style="padding-top:0">
     <label class="io-label">Decoded text</label>
     <textarea id="dec-output" readonly placeholder="Plain text will appear here…"></textarea>
   </div>
   <div class="btn-row">
     <button class="action" onclick="copyEl('dec-output')">Copy Text</button>
-    <button class="action secondary" onclick="clearDec()">Clear</button>
+    <button class="action secondary" onclick="clearDec()">Clear All</button>
   </div>
 </div>
 
@@ -552,7 +628,7 @@ function liveEncrypt() {
 }
 
 function liveDecrypt() {
-  const t = document.getElementById('dec-input').value;
+  const t = getDecryptInput();
   const k = parseInt(document.getElementById('dec-key').value);
   document.getElementById('dec-output').value = t ? decode(t, k) : '';
 }
@@ -571,6 +647,8 @@ function clearEnc() {
 function clearDec() {
   document.getElementById('dec-input').value = '';
   document.getElementById('dec-output').value = '';
+  pickerText = '';
+  updateRuneDisplay();
 }
 
 function toast(msg) {
@@ -602,6 +680,76 @@ function renderKeyTable() {
   }
 }
 
+
+// ─── DECRYPT MODE TOGGLE ─────────────────────────────────────────────────────
+let decryptMode = 'paste'; // 'paste' or 'enter'
+let pickerText = '';
+
+function setDecryptMode(mode) {
+  decryptMode = mode;
+  document.getElementById('dec-paste-mode').style.display = mode === 'paste' ? 'block' : 'none';
+  document.getElementById('dec-enter-mode').style.display = mode === 'enter' ? 'block' : 'none';
+  document.getElementById('btn-paste-mode').className = mode === 'paste' ? 'action' : 'action secondary';
+  document.getElementById('btn-enter-mode').className = mode === 'enter' ? 'action' : 'action secondary';
+  liveDecrypt();
+}
+
+function getDecryptInput() {
+  if (decryptMode === 'paste') {
+    return document.getElementById('dec-input').value;
+  } else {
+    return pickerText;
+  }
+}
+
+function updateRuneDisplay() {
+  const el = document.getElementById('rune-display');
+  el.textContent = pickerText;
+}
+
+function pickerAppend(ch) {
+  pickerText += ch;
+  updateRuneDisplay();
+  liveDecrypt();
+}
+
+function pickerBackspace() {
+  pickerText = [...pickerText].slice(0, -1).join('');
+  updateRuneDisplay();
+  liveDecrypt();
+}
+
+function pickerClear() {
+  pickerText = '';
+  updateRuneDisplay();
+  document.getElementById('dec-output').value = '';
+}
+
+// ─── BUILD RUNE PICKER ───────────────────────────────────────────────────────
+function buildRunePicker() {
+  // Collect all unique runes across the entire alphabet (all 9 shifts)
+  const seen = new Set();
+  const runes = [];
+  for (const [, variants] of ALPHABET) {
+    for (const r of variants) {
+      if (!seen.has(r)) { seen.add(r); runes.push(r); }
+    }
+  }
+  // Also add digit runes and middle dot
+  for (const r of Object.values(DIGITS)) {
+    if (!seen.has(r)) { seen.add(r); runes.push(r); }
+  }
+
+  const picker = document.getElementById('rune-picker');
+  for (const r of runes) {
+    const btn = document.createElement('button');
+    btn.className = 'rune-btn';
+    btn.textContent = r;
+    btn.onclick = () => pickerAppend(r);
+    picker.appendChild(btn);
+  }
+}
+
 // ─── ANIMATED HEADER ─────────────────────────────────────────────────────────
 const runePool = [...'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ'];
 const headerEl = document.getElementById('header-runes');
@@ -617,6 +765,7 @@ animateHeader();
 // Init
 updateInfo('enc');
 updateInfo('dec');
+buildRunePicker();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
