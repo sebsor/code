@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1a1410" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Runecrypt" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Runecrypt</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+    :root {
+      --bg:        #110e0b;
+      --surface:   #1c1710;
+      --border:    #3a2e1e;
+      --gold:      #c9963a;
+      --gold-dim:  #8a6422;
+      --rune:      #e8c87a;
+      --text:      #d4c4a0;
+      --muted:     #7a6a50;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 2.5rem 1.5rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-runes {
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+      color: var(--gold-dim);
+      opacity: 0.7;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-shadow: 0 0 30px rgba(201,150,58,0.3);
+    }
+
+    .subtitle {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .tabs {
+      display: flex;
+      padding: 1.2rem 1.5rem 0;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab:first-child { border-right: none; border-radius: 3px 0 0 3px; }
+    .tab:last-child  { border-radius: 0 3px 3px 0; }
+    .tab:nth-child(2) { border-right: none; }
+
+    .tab.active {
+      background: var(--surface);
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    .tab:hover:not(.active) {
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .key-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 1.5rem 0;
+    }
+
+    .key-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .key-select {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.95rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 3px;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .key-select:focus { border-color: var(--gold-dim); }
+
+    .info-panel {
+      margin: 0.7rem 1.5rem 0;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold-dim);
+      background: var(--surface);
+      border-radius: 0 3px 3px 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .info-panel strong { color: var(--text); }
+
+    .io-area {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .io-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'Crimson Pro', serif;
+      font-size: 1rem;
+      padding: 0.8rem 1rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: var(--gold-dim); }
+
+    textarea.rune-out {
+      color: var(--rune);
+      font-size: 1.35rem;
+      letter-spacing: 0.06em;
+      line-height: 1.9;
+    }
+
+    .btn-row {
+      padding: 0 1.5rem 0.5rem;
+      display: flex;
+      gap: 0.7rem;
+    }
+
+    button.action {
+      flex: 1;
+      padding: 0.75rem 1.2rem;
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    button.action:hover { background: rgba(201,150,58,0.08); border-color: var(--gold); }
+    button.action:active { background: rgba(201,150,58,0.15); }
+
+    button.action.secondary {
+      border-color: var(--border);
+      color: var(--muted);
+      flex: 0 0 auto;
+      padding: 0.75rem 1rem;
+    }
+
+    button.action.secondary:hover { border-color: var(--muted); color: var(--text); background: transparent; }
+
+    /* Key table */
+    #key-view { display: none; padding: 1rem 1.5rem 2rem; }
+    #key-view.visible { display: block; }
+
+    .key-intro {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.2rem;
+      line-height: 1.5;
+    }
+
+    table.key-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    table.key-table th {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    table.key-table td {
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid rgba(58,46,30,0.4);
+      vertical-align: middle;
+    }
+
+    table.key-table td.letter {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.9rem;
+      width: 2rem;
+    }
+
+    table.key-table td.runes {
+      color: var(--rune);
+      font-size: 1.25rem;
+      letter-spacing: 0.15em;
+    }
+
+    table.key-table td.rune-active {
+      color: var(--gold);
+      font-size: 1.3rem;
+    }
+
+    table.key-table td.name {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-style: italic;
+    }
+
+    #encrypt-view, #decrypt-view { display: none; }
+    #encrypt-view.visible, #decrypt-view.visible { display: block; }
+
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(3rem);
+      background: var(--surface);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.6rem 1.4rem;
+      border-radius: 3px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-runes" id="header-runes">ᚱᚢᚾᛖᚲᚱᚤᛈᛏ</div>
+  <h1>RUNECRYPT</h1>
+  <p class="subtitle">a cipher of the elder tongue</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="setMode('encrypt')">Encrypt</button>
+  <button class="tab" onclick="setMode('decrypt')">Decrypt</button>
+  <button class="tab" onclick="setMode('key')">Key Table</button>
+</div>
+
+<!-- ENCRYPT -->
+<div id="encrypt-view" class="visible">
+  <div class="key-row">
+    <span class="key-label">Key</span>
+    <select class="key-select" id="enc-key" onchange="updateInfo('enc'); liveEncrypt()">
+      <option value="0">Odin — ᚢᛚᚠᚱ</option>
+      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
+      <option value="2">Thor — ᛏᚺᛟᚱ</option>
+      <option value="3">Loki — ᛚᛟᚲᛁ</option>
+      <option value="4">Hel — ᚺᛖᛚ</option>
+    </select>
+  </div>
+  <div class="info-panel" id="enc-info"></div>
+  <div class="io-area">
+    <label class="io-label">Plain text</label>
+    <textarea id="input-text" placeholder="Write your message here…" oninput="liveEncrypt()"></textarea>
+  </div>
+  <div class="io-area" style="padding-top:0">
+    <label class="io-label">Encrypted runes</label>
+    <textarea id="output" class="rune-out" readonly placeholder="Runes will appear here…"></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="action" onclick="copyEl('output')">Copy Runes</button>
+    <button class="action secondary" onclick="clearEnc()">Clear</button>
+  </div>
+</div>
+
+<!-- DECRYPT -->
+<div id="decrypt-view">
+  <div class="key-row">
+    <span class="key-label">Key</span>
+    <select class="key-select" id="dec-key" onchange="updateInfo('dec'); liveDecrypt()">
+      <option value="0">Odin — ᚢᛚᚠᚱ</option>
+      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
+      <option value="2">Thor — ᛏᚺᛟᚱ</option>
+      <option value="3">Loki — ᛚᛟᚲᛁ</option>
+      <option value="4">Hel — ᚺᛖᛚ</option>
+    </select>
+  </div>
+  <div class="info-panel" id="dec-info"></div>
+  <div class="io-area">
+    <label class="io-label">Runic cipher text</label>
+    <textarea id="dec-input" class="rune-out" placeholder="Paste runes here…" oninput="liveDecrypt()"></textarea>
+  </div>
+  <div class="io-area" style="padding-top:0">
+    <label class="io-label">Decoded text</label>
+    <textarea id="dec-output" readonly placeholder="Plain text will appear here…"></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="action" onclick="copyEl('dec-output')">Copy Text</button>
+    <button class="action secondary" onclick="clearDec()">Clear</button>
+  </div>
+</div>
+
+<!-- KEY TABLE -->
+<div id="key-view">
+  <p class="key-intro">
+    Each letter maps to a different rune depending on where it appears in the message.
+    The key controls which rune variant is used at each position. Bright runes are active for the selected key.
+  </p>
+  <div class="key-row" style="padding-top:0; margin-bottom:1rem;">
+    <span class="key-label">Show key</span>
+    <select class="key-select" id="table-key" onchange="renderKeyTable()">
+      <option value="0">Odin — ᚢᛚᚠᚱ</option>
+      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
+      <option value="2">Thor — ᛏᚺᛟᚱ</option>
+      <option value="3">Loki — ᛚᛟᚲᛁ</option>
+      <option value="4">Hel — ᚺᛖᛚ</option>
+    </select>
+  </div>
+  <table class="key-table">
+    <thead>
+      <tr>
+        <th>Letter</th>
+        <th>Rune variants (shifts 0–8; active for key are bright)</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody id="key-table-body"></tbody>
+  </table>
+</div>
+
+<footer>Runecrypt · Share the key, not the secret</footer>
+<div id="toast"></div>
+
+<script>
+// ─── CIPHER ENGINE ────────────────────────────────────────────────────────────
+// Mathematically generated, collision-free 29×9 rune matrix.
+// Formula: rune_index = (letterIdx * 3 + shiftIdx * 29) % 96
+// This guarantees no two letters share the same rune in the same shift column.
+
+const ALPHABET = [
+  ['A', ['ᚠ','ᚽ','ᛚ','ᛷ','ᚴ','ᛑ','ᛮ','ᚫ','ᛈ'], 'Ansuz'],
+  ['B', ['ᚣ','ᛀ','ᛝ','᛺','ᚷ','ᛔ','ᛱ','ᚮ','ᛋ'], 'Berkanan'],
+  ['C', ['ᚦ','ᛃ','ᛠ','᛽','ᚺ','ᛗ','ᛴ','ᚱ','ᛎ'], 'Kaunan'],
+  ['D', ['ᚩ','ᛆ','ᛣ','ᚠ','ᚽ','ᛚ','ᛷ','ᚴ','ᛑ'], 'Dagaz'],
+  ['E', ['ᚬ','ᛉ','ᛦ','ᚣ','ᛀ','ᛝ','᛺','ᚷ','ᛔ'], 'Ehwaz'],
+  ['F', ['ᚯ','ᛌ','ᛩ','ᚦ','ᛃ','ᛠ','᛽','ᚺ','ᛗ'], 'Fehu'],
+  ['G', ['ᚲ','ᛏ','᛬','ᚩ','ᛆ','ᛣ','ᚠ','ᚽ','ᛚ'], 'Gebo'],
+  ['H', ['ᚵ','ᛒ','ᛯ','ᚬ','ᛉ','ᛦ','ᚣ','ᛀ','ᛝ'], 'Hagalaz'],
+  ['I', ['ᚸ','ᛕ','ᛲ','ᚯ','ᛌ','ᛩ','ᚦ','ᛃ','ᛠ'], 'Isaz'],
+  ['J', ['ᚻ','ᛘ','ᛵ','ᚲ','ᛏ','᛬','ᚩ','ᛆ','ᛣ'], 'Jera'],
+  ['K', ['ᚾ','ᛛ','ᛸ','ᚵ','ᛒ','ᛯ','ᚬ','ᛉ','ᛦ'], 'Kaunan-k'],
+  ['L', ['ᛁ','ᛞ','᛻','ᚸ','ᛕ','ᛲ','ᚯ','ᛌ','ᛩ'], 'Laguz'],
+  ['M', ['ᛄ','ᛡ','᛾','ᚻ','ᛘ','ᛵ','ᚲ','ᛏ','᛬'], 'Mannaz'],
+  ['N', ['ᛇ','ᛤ','ᚡ','ᚾ','ᛛ','ᛸ','ᚵ','ᛒ','ᛯ'], 'Naudiz'],
+  ['O', ['ᛊ','ᛧ','ᚤ','ᛁ','ᛞ','᛻','ᚸ','ᛕ','ᛲ'], 'Othalan'],
+  ['P', ['ᛍ','ᛪ','ᚧ','ᛄ','ᛡ','᛾','ᚻ','ᛘ','ᛵ'], 'Pertho'],
+  ['Q', ['ᛐ','᛭','ᚪ','ᛇ','ᛤ','ᚡ','ᚾ','ᛛ','ᛸ'], 'Qwertho'],
+  ['R', ['ᛓ','ᛰ','ᚭ','ᛊ','ᛧ','ᚤ','ᛁ','ᛞ','᛻'], 'Raidho'],
+  ['S', ['ᛖ','ᛳ','ᚰ','ᛍ','ᛪ','ᚧ','ᛄ','ᛡ','᛾'], 'Sowilo'],
+  ['T', ['ᛙ','ᛶ','ᚳ','ᛐ','᛭','ᚪ','ᛇ','ᛤ','ᚡ'], 'Tiwaz'],
+  ['U', ['ᛜ','᛹','ᚶ','ᛓ','ᛰ','ᚭ','ᛊ','ᛧ','ᚤ'], 'Uruz'],
+  ['V', ['ᛟ','᛼','ᚹ','ᛖ','ᛳ','ᚰ','ᛍ','ᛪ','ᚧ'], 'Vend'],
+  ['W', ['ᛢ','᛿','ᚼ','ᛙ','ᛶ','ᚳ','ᛐ','᛭','ᚪ'], 'Wunjo'],
+  ['X', ['ᛥ','ᚢ','ᚿ','ᛜ','᛹','ᚶ','ᛓ','ᛰ','ᚭ'], 'Algiz'],
+  ['Y', ['ᛨ','ᚥ','ᛂ','ᛟ','᛼','ᚹ','ᛖ','ᛳ','ᚰ'], 'Eiwaz'],
+  ['Z', ['᛫','ᚨ','ᛅ','ᛢ','᛿','ᚼ','ᛙ','ᛶ','ᚳ'], 'Algiz-z'],
+  ['Å', ['ᛮ','ᚫ','ᛈ','ᛥ','ᚢ','ᚿ','ᛜ','᛹','ᚶ'], 'Aasa'],
+  ['Ä', ['ᛱ','ᚮ','ᛋ','ᛨ','ᚥ','ᛂ','ᛟ','᛼','ᚹ'], 'Aera'],
+  ['Ö', ['ᛴ','ᚱ','ᛎ','᛫','ᚨ','ᛅ','ᛢ','᛿','ᚼ'], 'Othaz'],
+];
+
+// Polyalphabetic keys — shift sequences named after Norse figures.
+// At position i in the message, shift = sequence[i % sequence.length]
+// This determines which of the 9 rune variants to use for that letter.
+const KEYS = [
+  { name: 'Odin',  shifts: [3,1,4,1,5,0,2,6],     desc: 'shift pattern 3·1·4·1·5·0·2·6' },
+  { name: 'Freya', shifts: [2,7,1,8,2,8,1,8,2,8], desc: 'shift pattern 2·7·1·8·2·8·1·8·2·8' },
+  { name: 'Thor',  shifts: [1,3,5,7,0,2,4,6,8],   desc: 'shift pattern 1·3·5·7·0·2·4·6·8' },
+  { name: 'Loki',  shifts: [6,6,6,3,3,3,0,0,0],   desc: 'shift pattern 6·6·6·3·3·3·0·0·0' },
+  { name: 'Hel',   shifts: [0,8,1,7,2,6,3,5,4],   desc: 'shift pattern 0·8·1·7·2·6·3·5·4' },
+];
+
+// Build lookup: letter → index
+const letterToIdx = {};
+ALPHABET.forEach(([l], i) => { letterToIdx[l] = i; });
+
+// ─── ENCODE ──────────────────────────────────────────────────────────────────
+function encode(text, keyIdx) {
+  const key = KEYS[keyIdx];
+  let charPos = 0, result = '';
+  for (const ch of text) {
+    const upper = ch.toUpperCase();
+    if (letterToIdx[upper] !== undefined) {
+      const shift = key.shifts[charPos % key.shifts.length];
+      result += ALPHABET[letterToIdx[upper]][1][shift];
+      charPos++;
+    } else if (ch === '\n') {
+      result += '\n';
+    } else {
+      result += ch; // spaces, numbers, punctuation pass through as-is
+    }
+  }
+  return result;
+}
+
+// ─── DECODE ──────────────────────────────────────────────────────────────────
+// Because the matrix is collision-free per column, we can decode by:
+// for each rune at position charPos, look in column [shift] for a match.
+function decode(runeText, keyIdx) {
+  const key = KEYS[keyIdx];
+  let charPos = 0, result = '';
+  for (const ch of [...runeText]) {
+    if (ch === '\n') { result += '\n'; continue; }
+    // Try to match as a rune at the current key shift
+    const shift = key.shifts[charPos % key.shifts.length];
+    let matched = false;
+    for (let l = 0; l < ALPHABET.length; l++) {
+      if (ALPHABET[l][1][shift] === ch) {
+        result += ALPHABET[l][0];
+        charPos++;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      // Pass through spaces, punctuation, numbers, unknown chars
+      result += ch;
+    }
+  }
+  return result;
+}
+
+// ─── UI ──────────────────────────────────────────────────────────────────────
+function setMode(mode) {
+  ['encrypt','decrypt','key'].forEach((m, i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', m === mode);
+  });
+  document.getElementById('encrypt-view').classList.toggle('visible', mode === 'encrypt');
+  document.getElementById('decrypt-view').classList.toggle('visible', mode === 'decrypt');
+  document.getElementById('key-view').classList.toggle('visible', mode === 'key');
+  if (mode === 'key') renderKeyTable();
+}
+
+function updateInfo(side) {
+  const idx = parseInt(document.getElementById(side === 'enc' ? 'enc-key' : 'dec-key').value);
+  const k = KEYS[idx];
+  document.getElementById(side + '-info').innerHTML =
+    '<strong>' + k.name + '</strong> — ' + k.desc;
+}
+
+function liveEncrypt() {
+  const t = document.getElementById('input-text').value;
+  const k = parseInt(document.getElementById('enc-key').value);
+  document.getElementById('output').value = t ? encode(t, k) : '';
+}
+
+function liveDecrypt() {
+  const t = document.getElementById('dec-input').value;
+  const k = parseInt(document.getElementById('dec-key').value);
+  document.getElementById('dec-output').value = t ? decode(t, k) : '';
+}
+
+function copyEl(id) {
+  const v = document.getElementById(id).value;
+  if (!v) return;
+  navigator.clipboard.writeText(v).then(() => toast('Copied'));
+}
+
+function clearEnc() {
+  document.getElementById('input-text').value = '';
+  document.getElementById('output').value = '';
+}
+
+function clearDec() {
+  document.getElementById('dec-input').value = '';
+  document.getElementById('dec-output').value = '';
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ─── KEY TABLE ────────────────────────────────────────────────────────────────
+function renderKeyTable() {
+  const keyIdx = parseInt(document.getElementById('table-key').value);
+  const activeShifts = new Set(KEYS[keyIdx].shifts);
+  const tbody = document.getElementById('key-table-body');
+  tbody.innerHTML = '';
+
+  for (const [letter, variants, name] of ALPHABET) {
+    const runesCells = variants.map((r, s) => {
+      const active = activeShifts.has(s);
+      return '<span style="opacity:' + (active ? '1' : '0.18') + ';color:' + (active ? 'var(--rune)' : 'var(--muted)') + '">' + r + '</span>';
+    }).join('<span style="color:var(--border);font-size:0.7rem;padding:0 1px"> </span>');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="letter">' + letter + '</td>' +
+      '<td class="runes">' + runesCells + '</td>' +
+      '<td class="name">' + name + '</td>';
+    tbody.appendChild(tr);
+  }
+}
+
+// ─── ANIMATED HEADER ─────────────────────────────────────────────────────────
+const runePool = [...'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ'];
+const headerEl = document.getElementById('header-runes');
+
+function animateHeader() {
+  headerEl.textContent = Array.from({length: 11}, () =>
+    runePool[Math.floor(Math.random() * runePool.length)]).join('');
+  setTimeout(animateHeader, 2200);
+}
+
+animateHeader();
+
+// Init
+updateInfo('enc');
+updateInfo('dec');
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
