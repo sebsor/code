@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1a1410" />
+  <meta name="theme-color" content="#f4ede0" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -14,14 +14,14 @@
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
 
     :root {
-      --bg:        #0d0b08;
-      --surface:   #1a1510;
-      --border:    #5a4a30;
-      --gold:      #f0b840;
-      --gold-dim:  #c08828;
-      --rune:      #ffe090;
-      --text:      #f0e4c8;
-      --muted:     #b09a72;
+      --bg:        #f4ede0;
+      --surface:   #fffaf3;
+      --border:    #c8a96e;
+      --gold:      #7a4e10;
+      --gold-dim:  #9b6820;
+      --rune:      #5a2a08;
+      --text:      #2a1a08;
+      --muted:     #7a5c30;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +56,7 @@
       font-weight: 700;
       color: var(--gold);
       letter-spacing: 0.12em;
-      text-shadow: 0 0 30px rgba(201,150,58,0.3);
+      text-shadow: 0 0 20px rgba(120,78,16,0.15);
     }
 
     .subtitle {
@@ -98,7 +98,7 @@
 
     .tab:hover:not(.active) {
       color: var(--text);
-      background: rgba(255,255,255,0.02);
+      background: rgba(0,0,0,0.02);
     }
 
     .key-row {
@@ -206,8 +206,8 @@
       transition: all 0.2s;
     }
 
-    button.action:hover { background: rgba(201,150,58,0.08); border-color: var(--gold); }
-    button.action:active { background: rgba(201,150,58,0.15); }
+    button.action:hover { background: rgba(120,78,16,0.08); border-color: var(--gold); }
+    button.action:active { background: rgba(120,78,16,0.15); }
 
     button.action.secondary {
       border-color: var(--border);
@@ -249,7 +249,7 @@
 
     table.key-table td {
       padding: 0.3rem 0.5rem;
-      border-bottom: 1px solid rgba(58,46,30,0.4);
+      border-bottom: 1px solid rgba(180,140,80,0.35);
       vertical-align: middle;
     }
 
