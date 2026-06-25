@@ -3,404 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f4ede0" />
+  <meta name="theme-color" content="#060810" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Runecrypt" />
+  <meta name="apple-mobile-web-app-title" content="Imperial Cipher" />
   <link rel="manifest" href="manifest.json" />
-  <title>Runecrypt</title>
+  <title>Imperial Cipher</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap');
+    @font-face {
+      font-family: 'Aurebesh';
+      src: url('./Aurebesh Bold.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
     :root {
-      --bg:        #f4ede0;
-      --surface:   #fffaf3;
-      --border:    #c8a96e;
-      --gold:      #7a4e10;
-      --gold-dim:  #9b6820;
-      --rune:      #5a2a08;
-      --text:      #2a1a08;
-      --muted:     #7a5c30;
+      --bg:#060810; --surface:#0c0f1a; --surface2:#101525;
+      --border:#1e2d4a; --blue:#4fc3f7; --blue-dim:#1a6a9a;
+      --blue-glow:rgba(79,195,247,0.15); --red:#ef5350; --red-dim:#7a1a1a;
+      --text:#c8ddf5; --muted:#4a6a8a; --glyph:#7ecfff;
+      --scanline:rgba(79,195,247,0.03);
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 17px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    header {
-      text-align: center;
-      padding: 2.5rem 1.5rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .header-runes {
-      font-size: 1.1rem;
-      letter-spacing: 0.4em;
-      color: var(--gold-dim);
-      opacity: 0.7;
-      margin-bottom: 0.6rem;
-    }
-
-    h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: 0.12em;
-      text-shadow: 0 0 20px rgba(120,78,16,0.15);
-    }
-
-    .subtitle {
-      font-style: italic;
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-top: 0.3rem;
-      letter-spacing: 0.05em;
-    }
-
-    .tabs {
-      display: flex;
-      padding: 1.2rem 1.5rem 0;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 0.65rem 1rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab:first-child { border-right: none; border-radius: 3px 0 0 3px; }
-    .tab:last-child  { border-radius: 0 3px 3px 0; }
-    .tab:nth-child(2) { border-right: none; }
-
-    .tab.active {
-      background: var(--surface);
-      border-color: var(--gold-dim);
-      color: var(--gold);
-    }
-
-    .tab:hover:not(.active) {
-      color: var(--text);
-      background: rgba(0,0,0,0.02);
-    }
-
-    .key-row {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      padding: 1rem 1.5rem 0;
-    }
-
-    .key-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .key-select {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.95rem;
-      padding: 0.45rem 0.8rem;
-      border-radius: 3px;
-      appearance: none;
-      cursor: pointer;
-      outline: none;
-    }
-
-    .key-select:focus { border-color: var(--gold-dim); }
-
-    .info-panel {
-      margin: 0.7rem 1.5rem 0;
-      padding: 0.6rem 0.9rem;
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--gold);
-      background: var(--surface);
-      border-radius: 0 3px 3px 0;
-      font-size: 0.92rem;
-      color: var(--muted);
-    }
-
-    .info-panel strong { color: var(--text); }
-
-    .io-area {
-      padding: 1rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .io-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 130px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: var(--text);
-      font-family: 'Crimson Pro', serif;
-      font-size: 1.05rem;
-      padding: 0.8rem 1rem;
-      resize: vertical;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    textarea:focus { border-color: var(--gold-dim); }
-
-    textarea.rune-out {
-      color: var(--rune);
-      font-size: 1.35rem;
-      letter-spacing: 0.06em;
-      line-height: 1.9;
-    }
-
-    .btn-row {
-      padding: 0 1.5rem 0.5rem;
-      display: flex;
-      gap: 0.7rem;
-    }
-
-    button.action {
-      flex: 1;
-      padding: 0.75rem 1.2rem;
-      background: transparent;
-      border: 1px solid var(--gold-dim);
-      color: var(--gold);
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s;
-    }
-
-    button.action:hover { background: rgba(120,78,16,0.08); border-color: var(--gold); }
-    button.action:active { background: rgba(120,78,16,0.15); }
-
-    button.action.secondary {
-      border-color: var(--border);
-      color: var(--muted);
-      flex: 0 0 auto;
-      padding: 0.75rem 1rem;
-    }
-
-    button.action.secondary:hover { border-color: var(--muted); color: var(--text); background: transparent; }
-
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;line-height:1.6;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,var(--scanline) 0px,var(--scanline) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:999}
+    header{text-align:center;padding:1.8rem 1.5rem 1.2rem;border-bottom:1px solid var(--border)}
+    .emp-logo{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:0.6rem}
+    .imp-cog{width:32px;height:32px;border:2px solid var(--blue-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--blue-dim);font-size:1.1rem;opacity:0.6}
+    h1{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;color:var(--blue);letter-spacing:0.3em;text-transform:uppercase;text-shadow:0 0 20px rgba(79,195,247,0.5),0 0 60px rgba(79,195,247,0.2)}
+    .subtitle{color:var(--muted);font-size:0.72rem;margin-top:0.3rem;letter-spacing:0.2em;text-transform:uppercase}
+    .header-glyph-row{display:flex;justify-content:center;gap:4px;margin-top:0.6rem;opacity:0.4}
+    .tabs{display:flex;border-bottom:1px solid var(--border)}
+    .tab{flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-right:1px solid var(--border);color:var(--muted);font-family:'Orbitron',sans-serif;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+    .tab:last-child{border-right:none}
+    .tab.active{background:var(--blue-glow);color:var(--blue);border-bottom:2px solid var(--blue)}
+    .tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,0.02)}
+    .key-row{display:flex;align-items:center;gap:0.8rem;padding:1rem 1.2rem 0}
+    .key-label{font-family:'Orbitron',sans-serif;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+    .key-select{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:0.88rem;padding:0.5rem 0.8rem;border-radius:2px;appearance:none;cursor:pointer;outline:none}
+    .key-select:focus{border-color:var(--blue-dim)}
+    .info-panel{margin:0.7rem 1.2rem 0;padding:0.5rem 0.8rem;border:1px solid var(--border);border-left:3px solid var(--blue-dim);background:var(--surface2);font-size:0.78rem;color:var(--muted)}
+    .info-panel strong{color:var(--text)}
+    .io-area{padding:0.9rem 1.2rem;display:flex;flex-direction:column;gap:0.4rem}
+    .io-label{font-family:'Orbitron',sans-serif;font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+    textarea{width:100%;min-height:100px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.9rem;padding:0.7rem 0.9rem;resize:vertical;outline:none;transition:border-color 0.2s}
+    textarea:focus{border-color:var(--blue-dim);box-shadow:0 0 10px rgba(79,195,247,0.05)}
+    /* Glyph display box — uses Aurebesh font */
+    .glyph-output{min-height:90px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:0.7rem 0.9rem;cursor:default;font-family:'Aurebesh',monospace;font-size:1.6rem;color:var(--glyph);letter-spacing:0.05em;line-height:1.8;word-break:break-all;text-shadow:0 0 8px rgba(126,207,255,0.3)}
+    .glyph-output.empty::after{content:'Output will appear here…';color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.78rem;font-style:italic;text-shadow:none}
+    .glyph-space{display:inline-block;width:0.5em;vertical-align:middle}
+    .glyph-newline{width:100%;height:4px}
+    .btn-row{padding:0 1.2rem 0.5rem;display:flex;gap:0.6rem}
+    button.action{flex:1;padding:0.7rem 1rem;background:transparent;border:1px solid var(--blue-dim);color:var(--blue);font-family:'Orbitron',sans-serif;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s}
+    button.action:hover{background:var(--blue-glow);border-color:var(--blue)}
+    button.action:active{background:rgba(79,195,247,0.2)}
+    button.action.secondary{border-color:var(--border);color:var(--muted);flex:0 0 auto}
+    button.action.secondary:hover{border-color:var(--muted);color:var(--text);background:transparent}
+    button.action.danger{border-color:var(--red-dim);color:var(--red)}
+    button.action.danger:hover{background:rgba(239,83,80,0.1);border-color:var(--red)}
+    /* Picker */
+    .glyph-picker-box{min-height:80px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:0.7rem 0.9rem;font-family:'Aurebesh',monospace;font-size:1.5rem;color:var(--glyph);letter-spacing:0.05em;line-height:1.8;word-break:break-all;text-shadow:0 0 8px rgba(126,207,255,0.3)}
+    .glyph-picker-box.empty::after{content:'TAP GLYPHS BELOW TO ENTER CIPHER TEXT';color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:0.08em;text-shadow:none}
+    .glyph-picker{display:flex;flex-wrap:wrap;gap:0.3rem;padding:0.6rem 1.2rem}
+    .glyph-btn{width:44px;height:44px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;padding:4px}
+    .glyph-btn:hover{background:var(--blue-glow);border-color:var(--blue-dim)}
+    .glyph-btn:active{background:rgba(79,195,247,0.2)}
+    .picker-util-row{display:flex;gap:0.5rem;padding:0 1.2rem 0.5rem}
     /* Key table */
-    #key-view { display: none; padding: 1rem 1.5rem 2rem; }
-    #key-view.visible { display: block; }
-
-    .key-intro {
-      font-style: italic;
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.2rem;
-      line-height: 1.5;
-    }
-
-    table.key-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
-
-    table.key-table th {
-      font-family: 'Cinzel', serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0.4rem 0.5rem;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    table.key-table td {
-      padding: 0.3rem 0.5rem;
-      border-bottom: 1px solid rgba(180,140,80,0.35);
-      vertical-align: middle;
-    }
-
-    table.key-table td.letter {
-      font-family: 'Cinzel', serif;
-      color: var(--gold);
-      font-size: 0.9rem;
-      width: 2rem;
-    }
-
-    table.key-table td.runes {
-      color: var(--rune);
-      font-size: 1.25rem;
-      letter-spacing: 0.15em;
-    }
-
-    table.key-table td.rune-active {
-      color: var(--gold);
-      font-size: 1.3rem;
-    }
-
-    table.key-table td.name {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-style: italic;
-    }
-
-    #encrypt-view, #decrypt-view { display: none; }
-    #encrypt-view.visible, #decrypt-view.visible { display: block; }
-
-    #toast {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(3rem);
-      background: var(--surface);
-      border: 1px solid var(--gold-dim);
-      color: var(--gold);
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.6rem 1.4rem;
-      border-radius: 3px;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      z-index: 100;
-      white-space: nowrap;
-    }
-
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      border-top: 1px solid var(--border);
-      margin-top: 1rem;
-      opacity: 0.5;
-    }
-  
-    /* ── Rune picker ── */
-    .rune-display-box {
-      min-height: 80px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 0.8rem 1rem;
-      line-height: 1.9;
-      word-break: break-all;
-      cursor: default;
-    }
-
-    .rune-display-box:empty::before {
-      content: 'Tap runes below to enter cipher text…';
-      color: var(--muted);
-      font-size: 1rem;
-      font-style: italic;
-    }
-
-    .rune-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      padding: 0.8rem 1.5rem;
-    }
-
-    .rune-btn {
-      width: 2.6rem;
-      height: 2.6rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: var(--rune);
-      font-size: 1.25rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-      line-height: 1;
-    }
-
-    .rune-btn:hover  { background: rgba(120,78,16,0.08); border-color: var(--gold-dim); }
-    .rune-btn:active { background: rgba(120,78,16,0.18); }
-
-    .picker-util {
-      flex: 1;
-    }
-
-</style>
+    #key-view{display:none;padding:1rem 1.2rem 2rem}
+    #key-view.visible{display:block}
+    .key-intro{color:var(--muted);font-size:0.78rem;margin-bottom:1rem;line-height:1.6;border-left:3px solid var(--blue-dim);padding-left:0.8rem}
+    table.key-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+    table.key-table th{font-family:'Orbitron',sans-serif;font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:0.4rem 0.5rem;border-bottom:1px solid var(--border);text-align:left}
+    table.key-table td{padding:0.3rem 0.5rem;border-bottom:1px solid rgba(30,45,74,0.6);vertical-align:middle}
+    table.key-table td.letter{font-family:'Orbitron',sans-serif;color:var(--blue);font-size:0.78rem;width:2rem}
+    table.key-table td.glyphs{display:flex;flex-wrap:wrap;gap:2px;padding:0.25rem 0.5rem;align-items:center}
+    table.key-table td.name{color:var(--muted);font-size:0.68rem}
+    #encrypt-view,#decrypt-view{display:none}
+    #encrypt-view.visible,#decrypt-view.visible{display:block}
+    .section-divider{height:1px;background:var(--border);margin:0.2rem 1.2rem;opacity:0.5}
+    #toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(3rem);background:var(--surface2);border:1px solid var(--blue-dim);color:var(--blue);font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.6rem 1.4rem;border-radius:2px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:1000;white-space:nowrap;box-shadow:0 0 20px rgba(79,195,247,0.2)}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    footer{text-align:center;padding:1.2rem;color:var(--muted);font-size:0.65rem;border-top:1px solid var(--border);margin-top:1rem;letter-spacing:0.1em;opacity:0.5}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  </style>
 </head>
 <body>
-
 <header>
-  <div class="header-runes" id="header-runes">ᚱᚢᚾᛖᚲᚱᚤᛈᛏ</div>
-  <h1>RUNECRYPT</h1>
-  <p class="subtitle">a cipher of the elder tongue</p>
+  <div class="emp-logo">
+    <div class="imp-cog">⬡</div>
+    <h1>Imperial Cipher</h1>
+    <div class="imp-cog">⬡</div>
+  </div>
+  <p class="subtitle">Galactic Empire · Classified Transmission System</p>
+  <div class="header-glyph-row" id="header-glyphs"></div>
 </header>
 
 <div class="tabs">
   <button class="tab active" onclick="setMode('encrypt')">Encrypt</button>
   <button class="tab" onclick="setMode('decrypt')">Decrypt</button>
-  <button class="tab" onclick="setMode('key')">Key Table</button>
+  <button class="tab" onclick="setMode('key')">Cipher Key</button>
 </div>
 
 <!-- ENCRYPT -->
 <div id="encrypt-view" class="visible">
   <div class="key-row">
-    <span class="key-label">Key</span>
-    <select class="key-select" id="enc-key" onchange="updateInfo('enc'); liveEncrypt()">
-      <option value="0">Odin — ᚢᛚᚠᚱ</option>
-      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
-      <option value="2">Thor — ᛏᚺᛟᚱ</option>
-      <option value="3">Loki — ᛚᛟᚲᛁ</option>
-      <option value="4">Hela — ᚺᛖᛚ</option>
+    <span class="key-label">Cipher</span>
+    <select class="key-select" id="enc-key" onchange="updateInfo('enc');liveEncrypt()">
+      <option value="0">Coruscant — Imperial Capital</option>
+      <option value="1">Kuat — Imperial Shipyards</option>
+      <option value="2">Eriadu — Outer Rim Fortress</option>
+      <option value="3">Corellia — Core Stronghold</option>
+      <option value="4">Scarif — Imperial Security Complex</option>
     </select>
   </div>
   <div class="info-panel" id="enc-info"></div>
   <div class="io-area">
-    <label class="io-label">Plain text</label>
-    <textarea id="input-text" placeholder="Write your message here…" oninput="liveEncrypt()"></textarea>
+    <label class="io-label">Plaintext Transmission</label>
+    <textarea id="input-text" placeholder="Enter message to encode…" oninput="liveEncrypt()"></textarea>
   </div>
   <div class="io-area" style="padding-top:0">
-    <label class="io-label">Encrypted runes</label>
-    <textarea id="output" class="rune-out" readonly placeholder="Runes will appear here…"></textarea>
+    <label class="io-label">Encoded Output — Aurebesh Cipher</label>
+    <div class="glyph-output empty" id="enc-output"></div>
   </div>
   <div class="btn-row">
-    <button class="action" onclick="copyEl('output')">Copy Runes</button>
+    <button class="action" onclick="copyEncoded()">Transmit (Copy)</button>
     <button class="action secondary" onclick="clearEnc()">Clear</button>
   </div>
 </div>
@@ -408,52 +138,48 @@
 <!-- DECRYPT -->
 <div id="decrypt-view">
   <div class="key-row">
-    <span class="key-label">Key</span>
-    <select class="key-select" id="dec-key" onchange="updateInfo('dec'); liveDecrypt()">
-      <option value="0">Odin — ᚢᛚᚠᚱ</option>
-      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
-      <option value="2">Thor — ᛏᚺᛟᚱ</option>
-      <option value="3">Loki — ᛚᛟᚲᛁ</option>
-      <option value="4">Hela — ᚺᛖᛚ</option>
+    <span class="key-label">Cipher</span>
+    <select class="key-select" id="dec-key" onchange="updateInfo('dec');liveDecrypt()">
+      <option value="0">Coruscant — Imperial Capital</option>
+      <option value="1">Kuat — Imperial Shipyards</option>
+      <option value="2">Eriadu — Outer Rim Fortress</option>
+      <option value="3">Corellia — Core Stronghold</option>
+      <option value="4">Scarif — Imperial Security Complex</option>
     </select>
   </div>
   <div class="info-panel" id="dec-info"></div>
-
-  <!-- Mode toggle -->
   <div class="btn-row" style="padding-top:1rem;">
     <button class="action" id="btn-paste-mode" onclick="setDecryptMode('paste')">Paste Text</button>
     <button class="action secondary" id="btn-enter-mode" onclick="setDecryptMode('enter')">Enter Text</button>
   </div>
-
   <!-- Paste mode -->
   <div id="dec-paste-mode">
     <div class="io-area">
-      <label class="io-label">Runic cipher text</label>
-      <textarea id="dec-input" class="rune-out" placeholder="Paste runes here…" oninput="liveDecrypt()"></textarea>
+      <label class="io-label">Cipher Transmission</label>
+      <textarea id="dec-input" placeholder="Paste encoded text here…" oninput="liveDecrypt()" style="font-family:'Share Tech Mono',monospace;letter-spacing:0.1em"></textarea>
     </div>
   </div>
-
-  <!-- Enter mode (rune picker) -->
+  <!-- Enter mode -->
   <div id="dec-enter-mode" style="display:none">
     <div class="io-area">
-      <label class="io-label">Runic cipher text</label>
-      <div id="rune-display" class="rune-out rune-display-box"></div>
+      <label class="io-label">Cipher Transmission</label>
+      <div class="glyph-picker-box empty" id="glyph-display"></div>
     </div>
-    <div class="rune-picker" id="rune-picker"></div>
-    <div class="btn-row" style="padding-top:0.5rem;">
-      <button class="action secondary picker-util" onclick="pickerAppend(' ')">Space</button>
-      <button class="action secondary picker-util" onclick="pickerAppend('·')">· Dot</button>
-      <button class="action secondary picker-util" onclick="pickerBackspace()">⌫ Delete</button>
-      <button class="action secondary picker-util" onclick="pickerClear()">Clear</button>
+    <div class="glyph-picker" id="glyph-picker"></div>
+    <div class="picker-util-row">
+      <button class="action secondary" style="flex:1" onclick="pickerAppend(' ')">Space</button>
+      <button class="action secondary" style="flex:1" onclick="pickerAppend('|')">· Dot</button>
+      <button class="action secondary" style="flex:1" onclick="pickerBackspace()">⌫ Del</button>
+      <button class="action danger" style="flex:0 0 auto;padding:0.7rem 0.8rem" onclick="pickerClear()">Clear</button>
     </div>
   </div>
-
-  <div class="io-area" style="padding-top:0">
-    <label class="io-label">Decoded text</label>
-    <textarea id="dec-output" readonly placeholder="Plain text will appear here…"></textarea>
+  <div class="section-divider"></div>
+  <div class="io-area">
+    <label class="io-label">Decrypted Message</label>
+    <textarea id="dec-output" readonly placeholder="Decrypted text will appear here…"></textarea>
   </div>
   <div class="btn-row">
-    <button class="action" onclick="copyEl('dec-output')">Copy Text</button>
+    <button class="action" onclick="copyEl('dec-output')">Copy Message</button>
     <button class="action secondary" onclick="clearDec()">Clear All</button>
   </div>
 </div>
@@ -461,315 +187,347 @@
 <!-- KEY TABLE -->
 <div id="key-view">
   <p class="key-intro">
-    Each letter maps to a different rune depending on where it appears in the message. Digits 0–9 have fixed rune symbols. Punctuation (. , ! ? - etc.) becomes a middle dot ·.
-    The key controls which rune variant is used at each position. Bright runes are active for the selected key.
+    Each letter maps to a different Aurebesh glyph depending on its position in the transmission.
+    The cipher key determines which variant is used — without the correct key, decryption is impossible.
+    Digits 0–9 encode as fixed glyphs. Punctuation becomes a separator mark (·).
   </p>
-  <div class="key-row" style="padding-top:0; margin-bottom:1rem;">
-    <span class="key-label">Show key</span>
+  <div class="key-row" style="padding-top:0;margin-bottom:1rem">
+    <span class="key-label">Show cipher</span>
     <select class="key-select" id="table-key" onchange="renderKeyTable()">
-      <option value="0">Odin — ᚢᛚᚠᚱ</option>
-      <option value="1">Freya — ᚠᚱᛖᚤᚨ</option>
-      <option value="2">Thor — ᛏᚺᛟᚱ</option>
-      <option value="3">Loki — ᛚᛟᚲᛁ</option>
-      <option value="4">Hela — ᚺᛖᛚ</option>
+      <option value="0">Coruscant — Imperial Capital</option>
+      <option value="1">Kuat — Imperial Shipyards</option>
+      <option value="2">Eriadu — Outer Rim Fortress</option>
+      <option value="3">Corellia — Core Stronghold</option>
+      <option value="4">Scarif — Imperial Security Complex</option>
     </select>
   </div>
   <table class="key-table">
-    <thead>
-      <tr>
-        <th>Letter</th>
-        <th>Rune variants (shifts 0–8; active for key are bright)</th>
-        <th>Name</th>
-      </tr>
-    </thead>
+    <thead><tr><th>Letter</th><th>Glyph variants (active are bright)</th><th>Aurebesh name</th></tr></thead>
     <tbody id="key-table-body"></tbody>
   </table>
 </div>
 
-<footer>Runecrypt · Share the key, not the secret</footer>
+<footer>Imperial Cipher · Galactic Empire · Classified · For Authorized Personnel Only</footer>
 <div id="toast"></div>
 
 <script>
-// ─── CIPHER ENGINE ────────────────────────────────────────────────────────────
-// Mathematically generated, collision-free 29×9 rune matrix (safe range U+16A0–U+16EA only).
-// Formula: rune_index = (letterIdx * 2 + shiftIdx * 8) % 75
-// This guarantees no two letters share the same rune in the same shift column.
+// ═══════════════════════════════════════════════════════════════
+// AUREBESH GLYPH RENDERER
+// Each glyph is drawn as SVG paths/circles — no font dependency.
+// Canonical Aurebesh shapes based on the Star Wars alphabet.
+// ViewBox: 0 0 40 50, stroke-based, no fill.
+// ═══════════════════════════════════════════════════════════════
 
-const ALPHABET = [
-  ['A', ['ᚠ','ᚨ','ᚰ','ᚸ','ᛀ','ᛈ','ᛐ','ᛘ','ᛠ'], 'Ansuz'],
-  ['B', ['ᚢ','ᚪ','ᚲ','ᚺ','ᛂ','ᛊ','ᛒ','ᛚ','ᛢ'], 'Berkanan'],
-  ['C', ['ᚤ','ᚬ','ᚴ','ᚼ','ᛄ','ᛌ','ᛔ','ᛜ','ᛤ'], 'Kaunan'],
-  ['D', ['ᚦ','ᚮ','ᚶ','ᚾ','ᛆ','ᛎ','ᛖ','ᛞ','ᛦ'], 'Dagaz'],
-  ['E', ['ᚨ','ᚰ','ᚸ','ᛀ','ᛈ','ᛐ','ᛘ','ᛠ','ᛨ'], 'Ehwaz'],
-  ['F', ['ᚪ','ᚲ','ᚺ','ᛂ','ᛊ','ᛒ','ᛚ','ᛢ','ᛪ'], 'Fehu'],
-  ['G', ['ᚬ','ᚴ','ᚼ','ᛄ','ᛌ','ᛔ','ᛜ','ᛤ','ᚡ'], 'Gebo'],
-  ['H', ['ᚮ','ᚶ','ᚾ','ᛆ','ᛎ','ᛖ','ᛞ','ᛦ','ᚣ'], 'Hagalaz'],
-  ['I', ['ᚰ','ᚸ','ᛀ','ᛈ','ᛐ','ᛘ','ᛠ','ᛨ','ᚥ'], 'Isaz'],
-  ['J', ['ᚲ','ᚺ','ᛂ','ᛊ','ᛒ','ᛚ','ᛢ','ᛪ','ᚧ'], 'Jera'],
-  ['K', ['ᚴ','ᚼ','ᛄ','ᛌ','ᛔ','ᛜ','ᛤ','ᚡ','ᚩ'], 'Kaunan-k'],
-  ['L', ['ᚶ','ᚾ','ᛆ','ᛎ','ᛖ','ᛞ','ᛦ','ᚣ','ᚫ'], 'Laguz'],
-  ['M', ['ᚸ','ᛀ','ᛈ','ᛐ','ᛘ','ᛠ','ᛨ','ᚥ','ᚭ'], 'Mannaz'],
-  ['N', ['ᚺ','ᛂ','ᛊ','ᛒ','ᛚ','ᛢ','ᛪ','ᚧ','ᚯ'], 'Naudiz'],
-  ['O', ['ᚼ','ᛄ','ᛌ','ᛔ','ᛜ','ᛤ','ᚡ','ᚩ','ᚱ'], 'Othalan'],
-  ['P', ['ᚾ','ᛆ','ᛎ','ᛖ','ᛞ','ᛦ','ᚣ','ᚫ','ᚳ'], 'Pertho'],
-  ['Q', ['ᛀ','ᛈ','ᛐ','ᛘ','ᛠ','ᛨ','ᚥ','ᚭ','ᚵ'], 'Qwertho'],
-  ['R', ['ᛂ','ᛊ','ᛒ','ᛚ','ᛢ','ᛪ','ᚧ','ᚯ','ᚷ'], 'Raidho'],
-  ['S', ['ᛄ','ᛌ','ᛔ','ᛜ','ᛤ','ᚡ','ᚩ','ᚱ','ᚹ'], 'Sowilo'],
-  ['T', ['ᛆ','ᛎ','ᛖ','ᛞ','ᛦ','ᚣ','ᚫ','ᚳ','ᚻ'], 'Tiwaz'],
-  ['U', ['ᛈ','ᛐ','ᛘ','ᛠ','ᛨ','ᚥ','ᚭ','ᚵ','ᚽ'], 'Uruz'],
-  ['V', ['ᛊ','ᛒ','ᛚ','ᛢ','ᛪ','ᚧ','ᚯ','ᚷ','ᚿ'], 'Vend'],
-  ['W', ['ᛌ','ᛔ','ᛜ','ᛤ','ᚡ','ᚩ','ᚱ','ᚹ','ᛁ'], 'Wunjo'],
-  ['X', ['ᛎ','ᛖ','ᛞ','ᛦ','ᚣ','ᚫ','ᚳ','ᚻ','ᛃ'], 'Algiz'],
-  ['Y', ['ᛐ','ᛘ','ᛠ','ᛨ','ᚥ','ᚭ','ᚵ','ᚽ','ᛅ'], 'Eiwaz'],
-  ['Z', ['ᛒ','ᛚ','ᛢ','ᛪ','ᚧ','ᚯ','ᚷ','ᚿ','ᛇ'], 'Algiz-z'],
-  ['Å', ['ᛔ','ᛜ','ᛤ','ᚡ','ᚩ','ᚱ','ᚹ','ᛁ','ᛉ'], 'Aasa'],
-  ['Ä', ['ᛖ','ᛞ','ᛦ','ᚣ','ᚫ','ᚳ','ᚻ','ᛃ','ᛋ'], 'Aera'],
-  ['Ö', ['ᛘ','ᛠ','ᛨ','ᚥ','ᚭ','ᚵ','ᚽ','ᛅ','ᛍ'], 'Othaz'],
-];
+const GLYPH_SIZE = 28; // rendered px height
+const GLYPH_ASPECT = 40/50;
+const GLYPH_W = Math.round(GLYPH_SIZE * GLYPH_ASPECT);
 
-// Fixed rune symbols for digits 0–9 (never encrypted, always the same)
-// Chosen from safe range, visually distinct, not used in ALPHABET shift-0 column
-const DIGITS = {
-  '0': 'ᚾ', '1': 'ᚣ', '2': 'ᚦ', '3': 'ᚩ', '4': 'ᚯ',
-  '5': 'ᚲ', '6': 'ᚵ', '7': 'ᚻ', '8': 'ᛁ', '9': 'ᛄ'
+// Each glyph: SVG path data string (d attribute) + optional circles
+// Coordinates in 40x50 space
+const AUREBESH_GLYPHS = {
+  'A': { d:'M20,4 L5,42 M20,4 L35,42 M9,27 L31,27', c:[] },           // Aurek
+  'B': { d:'M10,5 L10,45 M10,5 L28,5 Q38,15 28,25 L10,25 M10,25 L28,25 Q38,35 28,45 L10,45', c:[] }, // Besh
+  'C': { d:'M33,10 A16,16 0 1,0 33,40', c:[] },                         // Cresh
+  'D': { d:'M10,5 L10,45 M10,5 Q38,5 38,25 Q38,45 10,45', c:[] },      // Dorn
+  'E': { d:'M10,5 L10,45 M10,5 L33,5 M10,25 L27,25 M10,45 L33,45', c:[] }, // Esk
+  'F': { d:'M10,5 L10,45 M10,5 L33,5 M10,23 L27,23', c:[] },            // Forn
+  'G': { d:'M33,10 A16,16 0 1,0 33,40 M33,25 L22,25', c:[] },           // Grek
+  'H': { d:'M8,5 L8,45 M32,5 L32,45 M8,25 L32,25', c:[] },              // Herf
+  'I': { d:'M20,5 L20,45 M13,5 L27,5 M13,45 L27,45', c:[] },            // Isk
+  'J': { d:'M28,5 L28,36 Q28,46 16,46 Q6,46 6,36', c:[] },              // Jenth
+  'K': { d:'M10,5 L10,45 M10,25 L32,7 M10,25 L32,43', c:[] },           // Krill
+  'L': { d:'M10,5 L10,45 M10,45 L32,45', c:[] },                         // Leth
+  'M': { d:'M5,45 L5,5 L20,22 L35,5 L35,45', c:[] },                    // Mern
+  'N': { d:'M8,45 L8,5 L32,45 L32,5', c:[] },                            // Nern
+  'O': { d:'', c:[{cx:20,cy:25,r:16}] },                                 // Osk
+  'P': { d:'M10,5 L10,45 M10,5 L28,5 Q38,15 28,25 L10,25', c:[] },     // Peth
+  'Q': { d:'M30,34 L38,44', c:[{cx:20,cy:22,r:14}] },                   // Qek
+  'R': { d:'M10,5 L10,45 M10,5 L28,5 Q38,15 28,25 L10,25 M26,25 L35,45', c:[] }, // Resh
+  'S': { d:'M32,10 Q20,15 20,25 Q20,35 8,40', c:[] },                   // Senth
+  'T': { d:'M5,10 L35,10 M20,10 L20,45', c:[] },                         // Trill
+  'U': { d:'M8,5 L8,34 Q8,46 20,46 Q32,46 32,34 L32,5', c:[] },        // Usk
+  'V': { d:'M5,5 L20,42 L35,5', c:[] },                                  // Vev
+  'W': { d:'M5,5 L5,45 L35,45 L35,5 L5,5', c:[] },                      // Wesk
+  'X': { d:'M5,5 L35,45 M35,5 L5,45', c:[] },                           // Xesh
+  'Y': { d:'M5,5 L20,26 L35,5 M20,26 L20,45', c:[] },                   // Yirt
+  'Z': { d:'M5,5 L35,5 L5,45 L35,45', c:[] },                           // Zerek
+  // Special: separator dot
+  '|': { d:'', c:[{cx:20,cy:25,r:4}] },
+  // Digits: simple angular numeric glyphs
+  '0': { d:'M8,5 L32,5 L32,45 L8,45 L8,5', c:[] },
+  '1': { d:'M14,12 L20,5 L20,45', c:[] },
+  '2': { d:'M8,10 Q8,5 20,5 Q32,5 32,15 L8,38 L32,38 L32,45 L8,45', c:[] },
+  '3': { d:'M8,5 L32,5 L20,25 L32,45 L8,45 M20,25 L8,25', c:[] },
+  '4': { d:'M28,5 L8,28 L32,28 M28,5 L28,45', c:[] },
+  '5': { d:'M32,5 L8,5 L8,25 L28,25 Q36,35 28,42 Q20,48 8,44', c:[] },
+  '6': { d:'M30,8 Q20,2 10,12 L8,30 Q8,46 20,46 Q32,46 32,34 Q32,22 20,22 L8,25', c:[] },
+  '7': { d:'M8,5 L32,5 L16,45', c:[] },
+  '8': { d:'M20,5 Q8,5 8,15 Q8,25 20,25 Q32,25 32,35 Q32,45 20,45 Q8,45 8,35 Q8,25 20,25 Q32,25 32,15 Q32,5 20,5', c:[] },
+  '9': { d:'M32,22 Q32,5 20,5 Q8,5 8,18 Q8,30 20,30 Q32,30 32,18 L32,38 Q32,47 20,47', c:[] },
 };
-const DIGITS_REV = Object.fromEntries(Object.entries(DIGITS).map(([k,v])=>[v,k]));
 
-// Punctuation → middle dot (·), decoded back to space
-const PUNCT = new Set([",",".","!","?","-",":",";","'","\""]);
-const PUNCT_RUNE = '·';
+function makeGlyphSVG(char, size, color) {
+  // Legacy SVG fallback — font now handles rendering
+  return '<span style="font-family:Aurebesh,monospace;color:' + (color||'var(--glyph)') + ';font-size:' + (size||24) + 'px">' + char + '</span>';
+}
 
-// Polyalphabetic keys — shift sequences named after Norse figures.
-// At position i in the message, shift = sequence[i % sequence.length]
-// This determines which of the 9 rune variants to use for that letter.
-const KEYS = [
-  { name: 'Odin',  shifts: [3,1,4,1,5,0,2,6],     desc: 'shift pattern 3·1·4·1·5·0·2·6' },
-  { name: 'Freya', shifts: [2,7,1,8,2,8,1,8,2,8], desc: 'shift pattern 2·7·1·8·2·8·1·8·2·8' },
-  { name: 'Thor',  shifts: [1,3,5,7,0,2,4,6,8],   desc: 'shift pattern 1·3·5·7·0·2·4·6·8' },
-  { name: 'Loki',  shifts: [6,6,6,3,3,3,0,0,0],   desc: 'shift pattern 6·6·6·3·3·3·0·0·0' },
-  { name: 'Hela',   shifts: [0,8,1,7,2,6,3,5,4],   desc: 'shift pattern 0·8·1·7·2·6·3·5·4' },
+function renderGlyphString(str, container, size) {
+  container.classList.toggle('empty', !str);
+  // Font renders Latin chars as Aurebesh glyphs directly
+  container.textContent = str || '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CIPHER ENGINE
+// Polyalphabetic substitution using 29 letters × 9 shifts.
+// Cipher chars are single ASCII letters (a-z + A-Z pool).
+// Each cipher char maps to one Aurebesh glyph for display.
+// The copy function outputs the raw cipher chars (letters) for sharing.
+// ═══════════════════════════════════════════════════════════════
+
+// 52-char pool (a-z + A-Z). Collision-free per shift column with offset=3, stride=7.
+const POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').concat(['Å','Ä','Ö']);
+const N=29, S=9, OFFSET=3, STRIDE=7;
+
+const MATRIX = [];
+for (let l=0;l<N;l++){const r=[];for(let s=0;s<S;s++)r.push(POOL[(l*OFFSET+s*STRIDE)%POOL.length]);MATRIX.push(r);}
+
+// Each pool char maps to an Aurebesh glyph letter (cycle through A-Z + special)
+// We map pool index → glyph key
+const GLYPH_KEYS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWX'; // 50 chars, cycles A-Z
+const poolToGlyph = {};
+POOL.forEach((ch, i) => { poolToGlyph[ch] = GLYPH_KEYS[i % 26]; });
+
+const DIGIT_MAP = {'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9'};
+const DIGIT_REV = Object.fromEntries(Object.entries(DIGIT_MAP).map(([k,v])=>[v,k]));
+const PUNCT = new Set([",",".",  "!","?","-",":",";"  ,"'","\""]);
+const PUNCT_CH = '|';
+
+const letterToIdx={};
+LETTERS.forEach((l,i)=>{letterToIdx[l]=i;});
+
+const KEYS=[
+  {name:'Coruscant',    shifts:[3,1,4,1,5,0,2,6],     desc:'Shift sequence 3·1·4·1·5·0·2·6'},
+  {name:'Kuat',shifts:[2,7,1,8,2,8,1,8,2,8], desc:'Shift sequence 2·7·1·8·2·8·1·8·2·8'},
+  {name:'Eriadu',   shifts:[1,3,5,7,0,2,4,6,8],   desc:'Shift sequence 1·3·5·7·0·2·4·6·8'},
+  {name:'Corellia',   shifts:[6,6,6,3,3,3,0,0,0],   desc:'Shift sequence 6·6·6·3·3·3·0·0·0'},
+  {name:'Scarif',  shifts:[0,8,1,7,2,6,3,5,4],   desc:'Shift sequence 0·8·1·7·2·6·3·5·4'},
 ];
 
-// Build lookup: letter → index
-const letterToIdx = {};
-ALPHABET.forEach(([l], i) => { letterToIdx[l] = i; });
-
-// ─── ENCODE ──────────────────────────────────────────────────────────────────
-function encode(text, keyIdx) {
-  const key = KEYS[keyIdx];
-  let charPos = 0, result = '';
-  for (const ch of text) {
-    const upper = ch.toUpperCase();
-    if (letterToIdx[upper] !== undefined) {
-      const shift = key.shifts[charPos % key.shifts.length];
-      result += ALPHABET[letterToIdx[upper]][1][shift];
-      charPos++;
-    } else if (DIGITS[ch]) {
-      result += DIGITS[ch];
-    } else if (PUNCT.has(ch)) {
-      result += PUNCT_RUNE;
-    } else if (ch === ' ') {
-      result += ' ';
-    } else if (ch === '\n') {
-      result += '\n';
-    } else {
-      result += ch;
-    }
+function encode(text,keyIdx){
+  const key=KEYS[keyIdx]; let pos=0,result='';
+  for(const ch of text){
+    const u=ch.toUpperCase();
+    if(letterToIdx[u]!==undefined){result+=MATRIX[letterToIdx[u]][key.shifts[pos%key.shifts.length]];pos++;}
+    else if(DIGIT_MAP[ch]) result+=ch;
+    else if(PUNCT.has(ch)) result+=PUNCT_CH;
+    else if(ch===' ') result+=' ';
+    else if(ch==='\n') result+='\n';
+    else result+=ch;
   }
   return result;
 }
 
-// ─── DECODE ──────────────────────────────────────────────────────────────────
-function decode(runeText, keyIdx) {
-  const key = KEYS[keyIdx];
-  let charPos = 0, result = '';
-  for (const ch of [...runeText]) {
-    if (ch === '\n') { result += '\n'; continue; }
-    if (ch === ' ')  { result += ' '; continue; }
-    if (ch === PUNCT_RUNE) { result += '.'; continue; }
-    if (DIGITS_REV[ch])   { result += DIGITS_REV[ch]; continue; }
-    const shift = key.shifts[charPos % key.shifts.length];
-    let matched = false;
-    for (let l = 0; l < ALPHABET.length; l++) {
-      if (ALPHABET[l][1][shift] === ch) {
-        result += ALPHABET[l][0];
-        charPos++;
-        matched = true;
-        break;
-      }
+// cipherToGlyph: convert a single cipher char to its glyph key
+function cipherToGlyph(ch){
+  if(ch===' '||ch==='\n'||ch===PUNCT_CH||DIGIT_MAP[ch]) return ch;
+  return poolToGlyph[ch]||null;
+}
+
+// cipherStringToGlyphString: convert full cipher string to glyph render string
+function cipherToGlyphStr(cipher){
+  return [...cipher].map(ch=>{
+    if(ch===' ') return ' ';
+    if(ch==='\n') return '\n';
+    if(ch===PUNCT_CH) return '|';
+    if(DIGIT_MAP[ch]) return ch;
+    return poolToGlyph[ch]||'';
+  }).join('');
+}
+
+function decode(cipher,keyIdx){
+  const key=KEYS[keyIdx]; let pos=0,result='';
+  for(const ch of [...cipher]){
+    if(ch==='\n'){result+='\n';continue;}
+    if(ch===' '){result+=' ';continue;}
+    if(ch===PUNCT_CH){result+='.';continue;}
+    if(DIGIT_REV[ch]){result+=DIGIT_REV[ch];continue;}
+    const shift=key.shifts[pos%key.shifts.length];
+    let matched=false;
+    for(let l=0;l<N;l++){
+      if(MATRIX[l][shift]===ch){result+=LETTERS[l];pos++;matched=true;break;}
     }
-    if (!matched) result += ch;
+    if(!matched) result+=ch;
   }
   return result;
 }
 
-// ─── UI ──────────────────────────────────────────────────────────────────────
-function setMode(mode) {
-  ['encrypt','decrypt','key'].forEach((m, i) => {
-    document.querySelectorAll('.tab')[i].classList.toggle('active', m === mode);
+// ═══════════════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════════════
+let encodedCipher = '';
+
+function setMode(mode){
+  ['encrypt','decrypt','key'].forEach((m,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',m===mode);
   });
-  document.getElementById('encrypt-view').classList.toggle('visible', mode === 'encrypt');
-  document.getElementById('decrypt-view').classList.toggle('visible', mode === 'decrypt');
-  document.getElementById('key-view').classList.toggle('visible', mode === 'key');
-  if (mode === 'key') renderKeyTable();
+  document.getElementById('encrypt-view').classList.toggle('visible',mode==='encrypt');
+  document.getElementById('decrypt-view').classList.toggle('visible',mode==='decrypt');
+  document.getElementById('key-view').classList.toggle('visible',mode==='key');
+  if(mode==='key') renderKeyTable();
 }
 
-function updateInfo(side) {
-  const idx = parseInt(document.getElementById(side === 'enc' ? 'enc-key' : 'dec-key').value);
-  const k = KEYS[idx];
-  document.getElementById(side + '-info').innerHTML =
-    '<strong>' + k.name + '</strong> — ' + k.desc;
+function updateInfo(side){
+  const idx=parseInt(document.getElementById(side==='enc'?'enc-key':'dec-key').value);
+  const k=KEYS[idx];
+  document.getElementById(side+'-info').innerHTML='<strong>'+k.name+'</strong> — '+k.desc;
 }
 
-function liveEncrypt() {
-  const t = document.getElementById('input-text').value;
-  const k = parseInt(document.getElementById('enc-key').value);
-  document.getElementById('output').value = t ? encode(t, k) : '';
-}
-
-function liveDecrypt() {
-  const t = getDecryptInput();
-  const k = parseInt(document.getElementById('dec-key').value);
-  document.getElementById('dec-output').value = t ? decode(t, k) : '';
-}
-
-function copyEl(id) {
-  const v = document.getElementById(id).value;
-  if (!v) return;
-  navigator.clipboard.writeText(v).then(() => toast('Copied'));
-}
-
-function clearEnc() {
-  document.getElementById('input-text').value = '';
-  document.getElementById('output').value = '';
-}
-
-function clearDec() {
-  document.getElementById('dec-input').value = '';
-  document.getElementById('dec-output').value = '';
-  pickerText = '';
-  updateRuneDisplay();
-}
-
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-// ─── KEY TABLE ────────────────────────────────────────────────────────────────
-function renderKeyTable() {
-  const keyIdx = parseInt(document.getElementById('table-key').value);
-  const activeShifts = new Set(KEYS[keyIdx].shifts);
-  const tbody = document.getElementById('key-table-body');
-  tbody.innerHTML = '';
-
-  for (const [letter, variants, name] of ALPHABET) {
-    const runesCells = variants.map((r, s) => {
-      const active = activeShifts.has(s);
-      return '<span style="opacity:' + (active ? '1' : '0.18') + ';color:' + (active ? 'var(--rune)' : 'var(--muted)') + '">' + r + '</span>';
-    }).join('<span style="color:var(--border);font-size:0.7rem;padding:0 1px"> </span>');
-
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td class="letter">' + letter + '</td>' +
-      '<td class="runes">' + runesCells + '</td>' +
-      '<td class="name">' + name + '</td>';
-    tbody.appendChild(tr);
-  }
-}
-
-
-// ─── DECRYPT MODE TOGGLE ─────────────────────────────────────────────────────
-let decryptMode = 'paste'; // 'paste' or 'enter'
-let pickerText = '';
-
-function setDecryptMode(mode) {
-  decryptMode = mode;
-  document.getElementById('dec-paste-mode').style.display = mode === 'paste' ? 'block' : 'none';
-  document.getElementById('dec-enter-mode').style.display = mode === 'enter' ? 'block' : 'none';
-  document.getElementById('btn-paste-mode').className = mode === 'paste' ? 'action' : 'action secondary';
-  document.getElementById('btn-enter-mode').className = mode === 'enter' ? 'action' : 'action secondary';
-  liveDecrypt();
-}
-
-function getDecryptInput() {
-  if (decryptMode === 'paste') {
-    return document.getElementById('dec-input').value;
+function liveEncrypt(){
+  const t=document.getElementById('input-text').value;
+  const k=parseInt(document.getElementById('enc-key').value);
+  encodedCipher = t ? encode(t,k) : '';
+  const out=document.getElementById('enc-output');
+  if(encodedCipher){
+    out.classList.remove('empty');
+    out.textContent = cipherToGlyphStr(encodedCipher);
   } else {
-    return pickerText;
+    out.textContent=''; out.classList.add('empty');
   }
 }
 
-function updateRuneDisplay() {
-  const el = document.getElementById('rune-display');
-  el.textContent = pickerText;
+function liveDecrypt(){
+  const t=getDecryptInput();
+  const k=parseInt(document.getElementById('dec-key').value);
+  document.getElementById('dec-output').value=t?decode(t,k):'';
 }
 
-function pickerAppend(ch) {
-  pickerText += ch;
-  updateRuneDisplay();
+function copyEncoded(){
+  if(!encodedCipher) return;
+  navigator.clipboard.writeText(encodedCipher).then(()=>toast('Transmission copied'));
+}
+
+function copyEl(id){
+  const v=document.getElementById(id).value;
+  if(!v) return;
+  navigator.clipboard.writeText(v).then(()=>toast('Copied'));
+}
+
+function clearEnc(){
+  document.getElementById('input-text').value='';
+  encodedCipher='';
+  const out=document.getElementById('enc-output');
+  out.textContent=''; out.classList.add('empty');
+}
+
+function clearDec(){
+  document.getElementById('dec-input').value='';
+  document.getElementById('dec-output').value='';
+  pickerText=''; updatePickerDisplay();
+}
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+
+// Decrypt modes
+let decryptMode='paste', pickerText='';
+
+function setDecryptMode(mode){
+  decryptMode=mode;
+  document.getElementById('dec-paste-mode').style.display=mode==='paste'?'block':'none';
+  document.getElementById('dec-enter-mode').style.display=mode==='enter'?'block':'none';
+  document.getElementById('btn-paste-mode').className=mode==='paste'?'action':'action secondary';
+  document.getElementById('btn-enter-mode').className=mode==='enter'?'action':'action secondary';
   liveDecrypt();
 }
 
-function pickerBackspace() {
-  pickerText = [...pickerText].slice(0, -1).join('');
-  updateRuneDisplay();
-  liveDecrypt();
+function getDecryptInput(){
+  return decryptMode==='paste'?document.getElementById('dec-input').value:pickerText;
 }
 
-function pickerClear() {
-  pickerText = '';
-  updateRuneDisplay();
-  document.getElementById('dec-output').value = '';
+function updatePickerDisplay(){
+  const el=document.getElementById('glyph-display');
+  if(!pickerText){el.textContent='';el.classList.add('empty');return;}
+  el.classList.remove('empty');
+  el.textContent=cipherToGlyphStr(pickerText);
 }
 
-// ─── BUILD RUNE PICKER ───────────────────────────────────────────────────────
-function buildRunePicker() {
-  // Collect all unique runes across the entire alphabet (all 9 shifts)
-  const seen = new Set();
-  const runes = [];
-  for (const [, variants] of ALPHABET) {
-    for (const r of variants) {
-      if (!seen.has(r)) { seen.add(r); runes.push(r); }
-    }
-  }
-  // Also add digit runes and middle dot
-  for (const r of Object.values(DIGITS)) {
-    if (!seen.has(r)) { seen.add(r); runes.push(r); }
-  }
+function pickerAppend(ch){pickerText+=ch;updatePickerDisplay();liveDecrypt();}
+function pickerBackspace(){pickerText=[...pickerText].slice(0,-1).join('');updatePickerDisplay();liveDecrypt();}
+function pickerClear(){pickerText='';updatePickerDisplay();document.getElementById('dec-output').value='';}
 
-  const picker = document.getElementById('rune-picker');
-  for (const r of runes) {
-    const btn = document.createElement('button');
-    btn.className = 'rune-btn';
-    btn.textContent = r;
-    btn.onclick = () => pickerAppend(r);
+function buildGlyphPicker(){
+  const seen=new Set(), glyphs=[];
+  for(const row of MATRIX) for(const g of row){if(!seen.has(g)){seen.add(g);glyphs.push(g);}}
+  for(const g of Object.values(DIGIT_MAP)){if(!seen.has(g)){seen.add(g);glyphs.push(g);}}
+  const picker=document.getElementById('glyph-picker');
+  for(const g of glyphs){
+    const glyphKey=poolToGlyph[g]||g;
+    const btn=document.createElement('button');
+    btn.className='glyph-btn';
+    btn.textContent=glyphKey;
+    btn.style.fontFamily="'Aurebesh',monospace";
+    btn.style.fontSize='1.2rem';
+    btn.style.color='var(--glyph)';
+    btn.onclick=()=>pickerAppend(g);
+    btn.title=glyphKey;
     picker.appendChild(btn);
   }
 }
 
-// ─── ANIMATED HEADER ─────────────────────────────────────────────────────────
-const runePool = [...'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ'];
-const headerEl = document.getElementById('header-runes');
-
-function animateHeader() {
-  headerEl.textContent = Array.from({length: 11}, () =>
-    runePool[Math.floor(Math.random() * runePool.length)]).join('');
-  setTimeout(animateHeader, 2200);
+function renderKeyTable(){
+  const keyIdx=parseInt(document.getElementById('table-key').value);
+  const activeShifts=new Set(KEYS[keyIdx].shifts);
+  const tbody=document.getElementById('key-table-body');
+  const aurebeshNames=['Aurek','Besh','Cresh','Dorn','Esk','Forn','Grek','Herf','Isk','Jenth','Krill','Leth','Mern','Nern','Osk','Peth','Qek','Resh','Senth','Trill','Usk','Vev','Wesk','Xesh','Yirt','Zerek','—','—','—'];
+  tbody.innerHTML='';
+  MATRIX.forEach((row,l)=>{
+    const tr=document.createElement('tr');
+    const glyphTd=document.createElement('td');
+    glyphTd.className='glyphs';
+    row.forEach((poolCh,s)=>{
+      const on=activeShifts.has(s);
+      const glyphKey=poolToGlyph[poolCh]||'A';
+      const span=document.createElement('span');
+      span.textContent=glyphKey;
+      span.style.fontFamily="'Aurebesh',monospace";
+      span.style.fontSize='1.1rem';
+      span.style.color=on?'var(--glyph)':'rgba(74,106,138,0.25)';
+      span.style.marginRight='3px';
+      glyphTd.appendChild(span);
+    });
+    tr.innerHTML=`<td class="letter">${LETTERS[l]}</td>`;
+    tr.appendChild(glyphTd);
+    const nameTd=document.createElement('td');
+    nameTd.className='name'; nameTd.textContent=aurebeshNames[l]||'';
+    tr.appendChild(nameTd);
+    tbody.appendChild(tr);
+  });
 }
 
-animateHeader();
+// Animated header glyphs — rendered via Aurebesh font
+const headerGlyphKeys='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+function animateHeader(){
+  const el=document.getElementById('header-glyphs');
+  el.style.fontFamily="'Aurebesh',monospace";
+  el.style.fontSize='1.1rem';
+  el.style.color='rgba(79,195,247,0.45)';
+  el.style.letterSpacing='0.2em';
+  el.textContent=Array.from({length:12},()=>headerGlyphKeys[Math.floor(Math.random()*26)]).join('');
+  setTimeout(animateHeader,2500);
+}
 
 // Init
 updateInfo('enc');
 updateInfo('dec');
-buildRunePicker();
+buildGlyphPicker();
+animateHeader();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 </body>
 </html>
