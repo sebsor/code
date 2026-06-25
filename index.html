@@ -168,7 +168,7 @@
     <div class="glyph-picker" id="glyph-picker"></div>
     <div class="picker-util-row">
       <button class="action secondary" style="flex:1" onclick="pickerAppend(' ')">Space</button>
-      <button class="action secondary" style="flex:1" onclick="pickerAppend('|')">· Dot</button>
+      <button class="action secondary" style="flex:1" onclick="pickerAppend('·')">· Dot</button>
       <button class="action secondary" style="flex:1" onclick="pickerBackspace()">⌫ Del</button>
       <button class="action danger" style="flex:0 0 auto;padding:0.7rem 0.8rem" onclick="pickerClear()">Clear</button>
     </div>
@@ -318,8 +318,12 @@ const KEYS=[
 function encode(text,keyIdx){
   const key=KEYS[keyIdx]; let pos=0,result='';
   for(const ch of text){
-    const u=ch.toUpperCase();
-    if(letterToIdx[u]!==undefined){result+=MATRIX[letterToIdx[u]][key.shifts[pos%key.shifts.length]];pos++;}
+    let u=ch.toUpperCase();
+    if(SWEDISH_SUB[u]) u=SWEDISH_SUB[u]; // Å→A, Ä→A, Ö→O
+    if(letterToIdx[u]!==undefined){
+      result+=MATRIX[letterToIdx[u]][key.shifts[pos%key.shifts.length]];
+      pos++;
+    }
     else if(DIGIT_MAP[ch]) result+=ch;
     else if(PUNCT.has(ch)) result+=PUNCT_CH;
     else if(ch===' ') result+=' ';
@@ -329,36 +333,23 @@ function encode(text,keyIdx){
   return result;
 }
 
-// cipherToGlyph: convert a single cipher char to its glyph key
-function cipherToGlyph(ch){
-  if(ch===' '||ch==='\n'||ch===PUNCT_CH||DIGIT_MAP[ch]) return ch;
-  return poolToGlyph[ch]||null;
-}
-
-// cipherStringToGlyphString: convert full cipher string to glyph render string
-function cipherToGlyphStr(cipher){
-  return [...cipher].map(ch=>{
-    if(ch===' ') return ' ';
-    if(ch==='\n') return '\n';
-    if(ch===PUNCT_CH) return '|';
-    if(DIGIT_MAP[ch]) return ch;
-    return poolToGlyph[ch]||'';
-  }).join('');
-}
+// cipherToGlyphStr: cipher IS the glyph string — A-Z chars render as Aurebesh via font
+function cipherToGlyphStr(cipher){ return cipher; }
 
 function decode(cipher,keyIdx){
   const key=KEYS[keyIdx]; let pos=0,result='';
-  for(const ch of [...cipher]){
+  for(const ch of [...cipher.toUpperCase()]){
     if(ch==='\n'){result+='\n';continue;}
     if(ch===' '){result+=' ';continue;}
-    if(ch===PUNCT_CH){result+='.';continue;}
+    if(ch===PUNCT_CH||ch==='.'){result+='.';continue;}
     if(DIGIT_REV[ch]){result+=DIGIT_REV[ch];continue;}
     const shift=key.shifts[pos%key.shifts.length];
     let matched=false;
     for(let l=0;l<N;l++){
       if(MATRIX[l][shift]===ch){result+=LETTERS[l];pos++;matched=true;break;}
     }
-    if(!matched) result+=ch;
+    if(!matched&&/[A-Z]/.test(ch)){result+='?';pos++;} // unknown glyph at this position
+    else if(!matched) result+=ch;
   }
   return result;
 }
@@ -405,6 +396,7 @@ function liveDecrypt(){
 
 function copyEncoded(){
   if(!encodedCipher) return;
+  // Cipher is already A-Z uppercase — copy directly, recipient pastes same string
   navigator.clipboard.writeText(encodedCipher).then(()=>toast('Transmission copied'));
 }
 
@@ -461,20 +453,32 @@ function pickerBackspace(){pickerText=[...pickerText].slice(0,-1).join('');updat
 function pickerClear(){pickerText='';updatePickerDisplay();document.getElementById('dec-output').value='';}
 
 function buildGlyphPicker(){
-  const seen=new Set(), glyphs=[];
-  for(const row of MATRIX) for(const g of row){if(!seen.has(g)){seen.add(g);glyphs.push(g);}}
-  for(const g of Object.values(DIGIT_MAP)){if(!seen.has(g)){seen.add(g);glyphs.push(g);}}
+  // Show all 26 A-Z glyphs + digits + dot separator
   const picker=document.getElementById('glyph-picker');
-  for(const g of glyphs){
-    const glyphKey=poolToGlyph[g]||g;
+  // Letters A-Z
+  for(let i=0;i<26;i++){
+    const g=String.fromCharCode(65+i);
     const btn=document.createElement('button');
     btn.className='glyph-btn';
-    btn.textContent=glyphKey;
+    btn.textContent=g;
     btn.style.fontFamily="'Aurebesh',monospace";
     btn.style.fontSize='1.2rem';
     btn.style.color='var(--glyph)';
     btn.onclick=()=>pickerAppend(g);
-    btn.title=glyphKey;
+    btn.title='Aurebesh '+g;
+    picker.appendChild(btn);
+  }
+  // Digits 0-9
+  for(let i=0;i<10;i++){
+    const g=String(i);
+    const btn=document.createElement('button');
+    btn.className='glyph-btn';
+    btn.textContent=g;
+    btn.style.fontFamily="'Aurebesh',monospace";
+    btn.style.fontSize='1.2rem';
+    btn.style.color='var(--glyph)';
+    btn.onclick=()=>pickerAppend(g);
+    btn.title='Digit '+g;
     picker.appendChild(btn);
   }
 }
@@ -489,11 +493,10 @@ function renderKeyTable(){
     const tr=document.createElement('tr');
     const glyphTd=document.createElement('td');
     glyphTd.className='glyphs';
-    row.forEach((poolCh,s)=>{
+    row.forEach((glyphCh,s)=>{
       const on=activeShifts.has(s);
-      const glyphKey=poolToGlyph[poolCh]||'A';
       const span=document.createElement('span');
-      span.textContent=glyphKey;
+      span.textContent=glyphCh; // already A-Z
       span.style.fontFamily="'Aurebesh',monospace";
       span.style.fontSize='1.1rem';
       span.style.color=on?'var(--glyph)':'rgba(74,106,138,0.25)';
